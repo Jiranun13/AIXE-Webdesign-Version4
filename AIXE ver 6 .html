@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Aixelink | ACE, IDH & CLAIRA</title>
+<style>
+/* ===================== TOKENS: light (titanium / medical white) default, dark override ===================== */
+:root{
+  --bg:#e9edf2; --glass:rgba(255,255,255,.66); --glass2:rgba(255,255,255,.42); --solid:rgba(255,255,255,.92); --line:rgba(110,130,160,.3); --hair:rgba(255,255,255,.85);
+  --text:#0b1a30; --mute:#4d6184; --ac:#0889a3; --ac-soft:rgba(10,155,181,.12); --ac-glow:rgba(10,155,181,.42);
+  --vi:#5b3df5; --vi-soft:rgba(91,61,245,.1); --on-ac:#fff; --orb:rgba(60,100,150,.5);
+  --m1:#ffffff; --m2:#a3abb8; --m3:#dfe4ea;
+  --shadow:0 24px 60px -24px rgba(20,50,100,.3); --ease:cubic-bezier(.22,1,.36,1); --hh:64px;
+  --font:"Inter","SF Pro Display","Segoe UI",system-ui,-apple-system,"Noto Sans Arabic","Noto Sans Thai","Tahoma",sans-serif;
+  color-scheme:light; box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+:root[data-theme=dark]{
+  --bg:#05080f; --glass:rgba(18,28,56,.58); --glass2:rgba(18,28,56,.36); --solid:rgba(14,22,44,.94); --line:rgba(120,150,200,.22); --hair:rgba(255,255,255,.1);
+  --text:#eaf0fc; --mute:#8fa2c8; --ac:#34e0f7; --ac-soft:rgba(52,224,247,.1); --ac-glow:rgba(52,224,247,.45);
+  --vi:#a490ff; --vi-soft:rgba(124,92,255,.15); --on-ac:#031018; --orb:rgba(120,170,230,.45);
+  --m1:#eef3fb; --m2:#566480; --m3:#a9b5cb; --shadow:0 24px 60px -24px rgba(0,0,0,.75); color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:inherit}
+/* ---- full-page section snapping: mandatory on large screens, gentle "proximity" on touch ---- */
+html{scroll-behavior:smooth;scroll-padding-top:calc(var(--hh) + env(safe-area-inset-top,0px));-webkit-text-size-adjust:100%;scroll-snap-type:y proximity}
+@media (min-width:1025px) and (hover:hover){html{scroll-snap-type:y mandatory}}
+body{margin:0;min-height:100%;color:var(--text);font:16px/1.6 var(--font);-webkit-font-smoothing:antialiased;
+  background:radial-gradient(900px 520px at 10% -5%,var(--ac-soft),transparent 70%),radial-gradient(800px 500px at 95% 18%,var(--vi-soft),transparent 70%),var(--bg);
+  background-attachment:fixed;transition:background-color .5s var(--ease),color .4s}
+[lang=th] body,[lang=ar] body{line-height:1.75}[lang=th] h1,[lang=th] h2{line-height:1.25!important}
+[lang=ar] *{letter-spacing:0!important}                      /* never track Arabic: it breaks letter joining */
+button,select{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+:focus-visible{outline:2px solid var(--ac);outline-offset:3px}
+h1,h2,h3{margin:0;letter-spacing:-.03em}
+.wrap{max-width:1220px;margin:0 auto;padding-inline:max(24px,env(safe-area-inset-left)) max(24px,env(safe-area-inset-right))}
+.snap{scroll-snap-align:start;min-height:100svh;display:flex;align-items:center;padding:calc(var(--hh) + 28px) 0 36px}
+.snap>.wrap{width:100%}
+.glass{background:var(--glass);border:1px solid var(--line);backdrop-filter:blur(22px) saturate(1.5);-webkit-backdrop-filter:blur(22px) saturate(1.5);box-shadow:var(--shadow),inset 0 1px 0 var(--hair)}
+.metal{background:linear-gradient(135deg,var(--m1),var(--m2) 45%,var(--m3) 62%,var(--m2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.eyebrow{display:inline-flex;align-items:center;gap:9px;padding:7px 16px;border-radius:999px;border:1px solid var(--line);color:var(--ac);font-size:12.5px;font-weight:600;letter-spacing:.1em;background:var(--glass2)}
+.eyebrow i{width:7px;height:7px;border-radius:50%;background:var(--ac);box-shadow:0 0 10px var(--ac)}
+.lead{color:var(--mute);font-size:clamp(16px,1.9vw,20px);max-width:660px;margin:0}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 28px;border-radius:999px;font-weight:600;text-decoration:none;border:1px solid transparent;transition:transform .5s var(--ease),box-shadow .5s var(--ease),border-color .3s}
+.btn.pri{background:linear-gradient(180deg,color-mix(in srgb,var(--ac) 85%,#fff),var(--ac));color:var(--on-ac);box-shadow:inset 0 1px 0 rgba(255,255,255,.4)}
+.btn.sec{background:var(--glass);border-color:var(--line);color:var(--text)}
+.btn:active{transform:scale(.97)}
+@media (hover:hover){.btn.pri:hover{box-shadow:0 10px 30px var(--ac-glow),inset 0 1px 0 rgba(255,255,255,.4);transform:translateY(-2px)}.btn.sec:hover{border-color:var(--ac)}}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tag{padding:5px 11px;border-radius:999px;font-size:12.5px;background:var(--glass2);border:1px solid var(--line);color:var(--text)}
+button.tag{min-height:36px;transition:.4s var(--ease)}button.tag:hover{border-color:var(--ac);color:var(--ac)}
+.works{display:inline-block;padding:6px 12px;border-radius:999px;background:var(--vi-soft);border:1px solid color-mix(in srgb,var(--vi) 45%,transparent);font-size:11.5px;color:var(--vi)}
+.works em{font-style:normal;color:var(--mute)}
+
+/* ===================== HEADER (language + theme) ===================== */
+.nav{position:fixed;top:0;inset-inline:0;z-index:50;padding-top:env(safe-area-inset-top,0px);background:var(--glass);border-bottom:1px solid var(--line);backdrop-filter:blur(22px) saturate(1.6);-webkit-backdrop-filter:blur(22px) saturate(1.6)}
+.nav .wrap{display:flex;align-items:center;justify-content:space-between;height:var(--hh);gap:14px}
+.brand{font-weight:800;letter-spacing:.14em;font-size:19px;white-space:nowrap;color:var(--text)}.brand b{font-weight:800;color:var(--ac)}
+.nav nav{display:flex;gap:26px;font-size:14px}.nav nav a{color:var(--mute);text-decoration:none;transition:color .3s}.nav nav a:hover{color:var(--ac)}
+.ctl{display:flex;align-items:center;gap:10px}
+.lang{height:36px;border-radius:999px;border:1px solid var(--line);background:var(--glass2);color:var(--text);padding:0 12px;font-size:13px;max-width:130px}
+.lang option{background:var(--bg);color:var(--text)}
+.tgl{position:relative;width:64px;height:36px;border-radius:999px;border:1px solid var(--line);background:var(--glass2);padding:0;flex:none}
+.tgl span{position:absolute;top:3px;inset-inline-start:3px;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-size:14px;background:linear-gradient(135deg,var(--m1),var(--m2));color:#243;box-shadow:0 2px 8px rgba(0,0,0,.25);transition:transform .5s var(--ease)}
+.tgl[aria-pressed=true] span{transform:translateX(28px)}[dir=rtl] .tgl[aria-pressed=true] span{transform:translateX(-28px)}
+.dots{position:fixed;inset-inline-end:14px;top:50%;transform:translateY(-50%);z-index:40;display:grid;gap:12px}
+.dots a{width:10px;height:10px;border-radius:50%;background:var(--line);border:1px solid var(--m2);transition:.4s var(--ease)}
+.dots a.on{background:var(--ac);border-color:var(--ac);transform:scale(1.5);box-shadow:0 0 10px var(--ac-glow)}
+
+/* ===================== HERO ===================== */
+.hero{text-align:center}
+.hero h1{font-size:clamp(34px,6vw,72px);line-height:1.04;margin:22px auto 18px;max-width:960px;font-weight:600;animation:rise 1.2s var(--ease) both}
+.hero h1 span{display:block}.hero h1 span+span{font-weight:300;color:var(--mute)}
+@keyframes rise{from{opacity:0;transform:translateY(24px)}}
+.hero .lead{margin-inline:auto}
+.ctas{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin:28px 0 40px}
+.strip{display:grid;grid-template-columns:1fr 48px 1.15fr 48px 1fr;align-items:stretch;text-align:start}
+.blk{border-radius:22px;padding:20px}
+.blk h3{font-size:12px;letter-spacing:.12em;color:var(--mute);margin-bottom:12px;font-weight:600}
+.blk.mid{border-color:var(--ac);box-shadow:0 0 50px var(--ac-glow),inset 0 1px 0 var(--hair)}.blk.mid h3{color:var(--ac)}.blk.mid b{font-size:22px;font-weight:600}
+.arrow{align-self:center;height:2px;margin:0 6px;background:repeating-linear-gradient(90deg,var(--ac) 0 6px,transparent 6px 12px);animation:dash 1s linear infinite}
+@keyframes dash{to{background-position:12px 0}}
+
+/* ===================== DIKW (compact = accordion + bottom sheet; wide = diagram + side panel in ONE viewport) ===================== */
+#architecture{padding-bottom:20px}
+.arch{display:grid;gap:18px;grid-template-columns:1fr}
+.side{display:flex;flex-direction:column;gap:12px;min-height:0}
+.side h2{font-size:clamp(26px,3.2vw,42px);line-height:1.1;font-weight:600}
+.hexbox{display:none;position:relative;border-radius:30px;padding:12px;overflow:hidden}
+.hexbox::before,.hexbox::after{content:"";position:absolute;width:24px;height:24px;border:2px solid var(--ac);opacity:.55;pointer-events:none}
+.hexbox::before{top:12px;left:12px;border-right:0;border-bottom:0;border-radius:8px 0 0 0}
+.hexbox::after{bottom:12px;right:12px;border-left:0;border-top:0;border-radius:0 0 8px 0}
+.hud{position:absolute;z-index:2;top:18px;font-size:11px;letter-spacing:.14em;font-weight:600;pointer-events:none}
+.hud.l{left:48px;color:var(--mute)}.hud.r{right:18px;color:var(--ac)}
+svg#dikw{display:block;width:100%;height:auto;direction:ltr}
+.band{fill:transparent;stroke:var(--line);stroke-width:1.2;fill-rule:evenodd;cursor:pointer;transition:fill .6s var(--ease),stroke .4s}
+.band.path{fill:var(--ac-soft)}.band.on{fill:var(--ac-soft);stroke:var(--ac);stroke-width:2.2;filter:drop-shadow(0 0 14px var(--ac-glow))}
+@media (hover:hover){.band:hover{fill:var(--ac-soft)}}
+.badge{cursor:pointer}.badge circle{fill:var(--solid);stroke:url(#metal);stroke-width:1.6;transition:.4s}.badge text{fill:var(--text);font:700 12px var(--font);text-anchor:middle;pointer-events:none}
+.badge.on circle{fill:var(--ac);stroke:var(--ac);filter:drop-shadow(0 0 8px var(--ac-glow))}.badge.on text{fill:var(--on-ac)}
+.ln{fill:none;stroke:var(--line);stroke-width:1.6;stroke-dasharray:3 5;transition:stroke .5s var(--ease)}
+.ln.on{stroke:var(--ac);stroke-width:2.4;stroke-dasharray:none;filter:drop-shadow(0 0 6px var(--ac-glow))}
+.amb{fill:var(--ac);opacity:.4}
+.pulse{fill:#fff;stroke:var(--ac);stroke-width:2;filter:drop-shadow(0 0 7px var(--ac))}
+.node{cursor:pointer;outline:none;transition:opacity .5s var(--ease)}
+.has-sel .node:not(.on):not(.path){opacity:.45}
+.hx{fill:var(--solid);stroke:url(#metal);stroke-width:2;transition:fill .5s var(--ease),stroke-width .3s,filter .5s var(--ease)}
+.node text{fill:var(--text);font:600 12.5px var(--font);text-anchor:middle;pointer-events:none}
+.node.s text{font-size:10px}
+@media (hover:hover){.node:hover .hx{stroke:var(--ac)}}
+.node:focus-visible .hx{stroke:var(--ac);stroke-width:3.5}
+.node.path .hx{stroke:var(--ac);stroke-width:2.4;filter:drop-shadow(0 0 8px var(--ac-glow))}
+.node.on .hx{fill:var(--ac-soft);stroke:var(--ac);stroke-width:3;filter:drop-shadow(0 0 16px var(--ac-glow))}
+.halo{fill:none;stroke:var(--ac);stroke-width:1.5;opacity:0;transform-box:fill-box;transform-origin:center}
+.node.on .halo{animation:halo 2.4s var(--ease) infinite}
+@keyframes halo{from{transform:scale(.95);opacity:.8}to{transform:scale(1.6);opacity:0}}
+.layers{display:grid;gap:10px}
+.lay{border-radius:20px;overflow:hidden;transition:border-color .4s,box-shadow .5s var(--ease)}
+.lay.on{border-color:var(--ac);box-shadow:0 0 30px var(--ac-glow),inset 0 1px 0 var(--hair)}
+.lay-h{width:100%;display:flex;align-items:center;gap:12px;padding:12px 16px;background:none;border:0;text-align:start;min-height:56px}
+.lb{flex:none;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-weight:700;background:linear-gradient(135deg,var(--m1),var(--m3));border:1px solid var(--line);color:#1a2b46;transition:.4s}
+.lay.on .lb{background:var(--ac);color:var(--on-ac);box-shadow:0 0 14px var(--ac-glow)}
+.lay-h b{display:block;font-size:15px;font-weight:600;line-height:1.25}.lay-h small{color:var(--mute);font-size:12.5px;line-height:1.3;display:block}
+.chev{margin-inline-start:auto;transition:transform .4s var(--ease)}.lay.open .chev{transform:rotate(180deg)}
+.lay-b{display:none;padding:0 16px 14px;flex-wrap:wrap;gap:8px}.lay.open .lay-b{display:flex}
+.chip{min-height:44px;padding:0 16px;border-radius:999px;border:1px solid var(--line);background:var(--glass2);font-weight:600;font-size:14px;transition:all .5s var(--ease)}
+.chip[aria-pressed=true]{background:var(--ac);color:var(--on-ac);border-color:var(--ac);box-shadow:0 8px 24px var(--ac-glow)}
+/* detail: bottom sheet in compact mode */
+.detail{position:fixed;z-index:45;inset-inline:max(12px,env(safe-area-inset-left));bottom:calc(12px + env(safe-area-inset-bottom,0px));max-height:46svh;border-radius:26px;overflow:hidden;display:flex;flex-direction:column;transform:translateY(135%);transition:transform .6s var(--ease)}
+.detail.open{transform:none}
+.detail .media{display:none}
+.xbtn{position:absolute;top:10px;inset-inline-end:10px;width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--glass2);z-index:3}
+.dbody{padding:20px 20px 22px;display:flex;flex-direction:column;gap:9px;overflow:auto;min-height:0}
+.status{display:flex;align-items:center;gap:10px;font-size:12px;font-weight:700;letter-spacing:.12em;color:var(--mute);padding-inline-end:44px}
+.status i{width:9px;height:9px;border-radius:50%;background:var(--mute);transition:.4s;flex:none}
+.detail.live .status{color:var(--ac)}.detail.live .status i{background:var(--ac);box-shadow:0 0 12px var(--ac)}
+.crumb{display:flex;gap:6px;flex-wrap:wrap;font-size:11.5px;font-weight:600}
+.crumb span{padding:3px 9px;border-radius:999px;border:1px solid var(--line);color:var(--mute);transition:.4s}
+.crumb span.p{color:var(--ac);border-color:color-mix(in srgb,var(--ac) 45%,transparent)}
+.crumb span.a{background:var(--ac);color:var(--on-ac);border-color:var(--ac);box-shadow:0 0 12px var(--ac-glow)}
+.dbody h3{font-size:clamp(22px,2.6vw,32px);font-weight:300;line-height:1.15}
+.dsub{margin:0;color:var(--ac);font-weight:600;font-size:14px}.dbody p{margin:0;color:var(--mute);font-size:14.5px}
+.label{font-size:11.5px;letter-spacing:.12em;color:var(--mute);font-weight:600;margin-top:2px}
+.media{position:relative;overflow:hidden;background:linear-gradient(135deg,#0f2447,#0a9bb5 130%)}
+.media img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;transition:transform 1.2s var(--ease),opacity .6s}
+.media::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(5,12,28,.05),rgba(5,12,28,.55))}
+.media .k{position:absolute;z-index:2;inset-inline-start:14px;bottom:12px;font-size:11px;font-weight:700;letter-spacing:.14em;color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.5)}
+@media (min-width:900px) and (min-height:600px){      /* WIDE: everything inside one screen height */
+  #architecture{padding-top:calc(var(--hh) + 14px);padding-bottom:14px}
+  .arch{grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);align-items:center;gap:26px}
+  .hexbox{display:block;width:min(100%,calc(100svh - var(--hh) - 40px));justify-self:center}
+  .side{height:min(calc(100svh - var(--hh) - 40px),800px)}
+  .layers{grid-template-columns:repeat(4,1fr);gap:8px}
+  .lay-h{flex-direction:column;align-items:flex-start;gap:6px;padding:10px 12px;min-height:0}
+  .lay-h small{display:none}.chev{display:none}.lay-b,.lay.open .lay-b{display:none}
+  .detail{position:relative;inset:auto;transform:none!important;flex:1;min-height:0;max-height:none;border-radius:26px}
+  .detail .media{display:block;flex:none;height:clamp(70px,14svh,140px)}
+  .xbtn{display:none}
+  .side .lead{display:none}@media (min-height:820px){.side .lead{display:block}}
+}
+
+/* ===================== ACE ENGINE ===================== */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:44px;align-items:center}
+.two h2{font-size:clamp(64px,9vw,120px);font-weight:300;line-height:.95;letter-spacing:-.04em;margin:16px 0 6px}
+.two .sub{font-size:clamp(15px,1.8vw,20px);font-weight:600;letter-spacing:.14em;color:var(--ac);margin:0 0 16px}
+.engine{position:relative;aspect-ratio:1;width:min(100%,520px);margin-inline:auto}
+.engine svg{width:100%;height:100%}
+.eo{fill:none;stroke:var(--orb);stroke-dasharray:2 10;stroke-linecap:round;stroke-width:2;transform-box:fill-box;transform-origin:center;animation:spin 80s linear infinite}
+.eo.b{animation-duration:55s;animation-direction:reverse}.eo.c{animation-duration:120s}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ecore{fill:var(--solid);stroke:url(#metal2);stroke-width:2.5;filter:drop-shadow(0 0 26px var(--ac-glow))}
+.etxt{fill:var(--text);font:200 54px var(--font);text-anchor:middle;letter-spacing:.04em}
+.esub{fill:var(--ac);font:700 8.5px var(--font);text-anchor:middle;letter-spacing:.18em}
+.etag{position:absolute;padding:8px 16px;border-radius:999px;font-size:13px;font-weight:600;background:var(--solid);border:1px solid var(--line);box-shadow:0 12px 26px -12px rgba(10,30,70,.4)}
+.etag i{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--ac);box-shadow:0 0 8px var(--ac);margin-inline-end:8px}
+.ints{margin-top:22px}.ints .label{margin-bottom:8px}
+
+/* ===================== IDH (3D, metallic, glass) ===================== */
+.idh-wrap{position:relative;padding:2px;border-radius:40px;background:linear-gradient(135deg,var(--m1),var(--m2) 30%,var(--m3) 55%,var(--m2) 80%,var(--m1));box-shadow:0 60px 100px -34px rgba(8,30,70,.5),0 18px 36px -14px rgba(8,30,70,.3)}
+.idh-wrap::before{content:"";position:absolute;inset:8% 6% -6%;background:radial-gradient(closest-side,var(--ac-glow),transparent);filter:blur(50px);opacity:.6;z-index:-1}
+.idh-card{position:relative;border-radius:38px;padding:40px 44px;display:grid;grid-template-columns:1.05fr 1fr;gap:30px;align-items:center;background:linear-gradient(160deg,var(--glass),var(--glass2));backdrop-filter:blur(26px) saturate(1.6);-webkit-backdrop-filter:blur(26px) saturate(1.6);box-shadow:inset 0 1px 0 var(--hair),inset 0 0 80px var(--ac-soft)}
+.idh-card::before{content:"";position:absolute;inset:10px;border-radius:30px;border:1px solid var(--line);pointer-events:none}
+.idh-card h2{font-size:clamp(56px,8.5vw,104px);font-weight:300;line-height:.9;letter-spacing:-.04em;margin:14px 0 6px}
+.idh-card .sub{font-size:clamp(17px,2vw,22px);font-weight:300;color:var(--mute);margin:0 0 14px}
+.conn{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:18px 0 14px}
+.cbox{border-radius:20px;padding:14px 16px;background:var(--solid);border:1px solid var(--line);box-shadow:0 10px 24px -14px rgba(10,30,70,.35)}
+.cbox b{display:block;font-size:24px;font-weight:300;letter-spacing:-.02em}.cbox span{font-size:13px;color:var(--mute)}
+.cbox.net{border-color:var(--ac);box-shadow:0 0 28px var(--ac-glow)}.cbox.net b{color:var(--ac)}
+.stage3d{perspective:1200px;touch-action:pan-y}.tilt{transform-style:preserve-3d;transition:transform .7s var(--ease)}
+.float{position:relative;aspect-ratio:1/.8;display:grid;place-items:center;transform-style:preserve-3d;animation:float 7s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-12px)}}
+.float .sh{position:absolute;inset-inline:12%;bottom:6%;height:14%;border-radius:50%;background:rgba(5,20,50,.45);filter:blur(22px);transform:translateZ(-60px)}
+.float svg{position:relative;width:100%;transform:translateZ(40px);filter:drop-shadow(0 28px 22px rgba(10,30,60,.35))}
+.fchip{position:absolute;padding:7px 14px;border-radius:999px;font-size:12px;font-weight:600;background:var(--solid);border:1px solid var(--line);box-shadow:0 14px 30px -10px rgba(10,30,70,.4);transform:translateZ(90px);white-space:nowrap}
+.fchip i{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--ac);box-shadow:0 0 8px var(--ac);margin-inline-end:7px}
+
+/* ===================== CLAIRA ===================== */
+.phone{width:min(330px,100%);margin-inline:auto;padding:2px;border-radius:40px;background:linear-gradient(135deg,var(--m1),var(--m2),var(--m3),var(--m2));box-shadow:0 50px 90px -30px rgba(8,30,70,.5)}
+.phone>div{border-radius:38px;padding:20px 18px 22px;background:linear-gradient(170deg,var(--solid),var(--glass));min-height:430px;display:flex;flex-direction:column;gap:12px;box-shadow:inset 0 0 60px var(--ac-soft)}
+.ph-h{display:flex;align-items:center;justify-content:space-between;font-weight:700;letter-spacing:.14em;font-size:13px}
+.ph-h small{color:var(--ac);font-size:11px;letter-spacing:.08em;font-weight:600}
+.wave{display:flex;align-items:center;justify-content:center;gap:4px;height:64px}
+.wave span{width:4px;height:8px;border-radius:3px;background:var(--ac);opacity:.5;transition:opacity .3s}
+.wave.on span{opacity:1;animation:bar 1s ease-in-out infinite}
+@keyframes bar{50%{height:52px}}
+.bub{max-width:88%;padding:10px 14px;border-radius:18px;font-size:14px;min-height:20px;opacity:0;transform:translateY(8px);transition:.5s var(--ease)}
+.bub.show{opacity:1;transform:none}
+.bub.u{align-self:flex-end;background:var(--ac);color:var(--on-ac);border-end-end-radius:6px}
+.bub.a{align-self:flex-start;background:var(--glass2);border:1px solid var(--line);border-end-start-radius:6px}
+.mic{margin:auto auto 0;width:56px;height:56px;border-radius:50%;border:1px solid var(--ac);background:var(--ac-soft);box-shadow:0 0 26px var(--ac-glow);font-size:22px}
+.note{text-align:center;font-size:11px;color:var(--mute)}
+.feat{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}.feat .tag{font-size:14px;padding:8px 16px;border-color:color-mix(in srgb,var(--ac) 40%,transparent)}
+
+/* ===================== PRODUCTS ===================== */
+.sec-head{max-width:740px;margin-bottom:26px}.sec-head h2{font-size:clamp(28px,4vw,48px);line-height:1.1;font-weight:600;margin-bottom:10px}
+.cat{display:flex;align-items:center;gap:14px;margin:26px 0 14px;font-size:13px;font-weight:700;letter-spacing:.14em;color:var(--ac)}
+.cat::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--line),transparent)}
+.deck{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.card{--mx:50%;--my:0%;transform:perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateY(var(--ty2,0px));display:flex;flex-direction:column;border-radius:22px;overflow:hidden;transition:transform .6s var(--ease),border-color .4s}
+@media (hover:hover){.card:hover{--ty2:-5px;border-color:var(--ac)}.card:hover .media img{transform:scale(1.06)}}
+.card .media{aspect-ratio:16/7.5}
+.card .body{position:relative;padding:16px 18px 16px;display:flex;flex-direction:column;gap:6px;flex:1;background:radial-gradient(240px circle at var(--mx) var(--my),var(--ac-soft),transparent 70%)}
+.card h3{font-size:19px;font-weight:600}.card p{margin:0;color:var(--mute);font-size:14px;flex:1}
+.card .view{align-self:flex-start;padding:0;min-height:40px;background:none;border:0;color:var(--ac);font-weight:600}
+footer{scroll-snap-align:end;padding:34px 0 40px;border-top:1px solid var(--line);color:var(--mute);font-size:13.5px;text-align:center}
+
+
+/* light theme: big product names used a white-to-grey metallic gradient that vanished on white. Use a deep navy-to-teal one instead */
+:root:not([data-theme=dark]) .metal{background:linear-gradient(135deg,#071327 5%,#0a8aa4 55%,#12335e 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero h1 span+span{font-weight:400}
+
+/* ===================== FUN LAYER ===================== */
+#fx{position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none}
+.glow{position:fixed;left:var(--px,50%);top:var(--py,28%);width:560px;height:560px;border-radius:50%;pointer-events:none;z-index:-1;background:radial-gradient(closest-side,var(--ac-glow),transparent);opacity:.22;transform:translate(-50%,-50%);transition:left .7s var(--ease),top .7s var(--ease)}
+.btn{translate:var(--tx,0) var(--ty,0)}
+.rv{opacity:0;transform:translateY(30px);transition:opacity .9s var(--ease),transform .9s var(--ease)}.rv.in{opacity:1;transform:none}
+.spark{fill:var(--ac);animation:spark .8s var(--ease) forwards}
+@keyframes spark{to{transform:translate(var(--dx),var(--dy)) scale(.2);opacity:0}}
+.tour{align-self:flex-start;display:inline-flex;align-items:center;gap:10px;min-height:44px;padding:0 20px;border-radius:999px;border:1px solid var(--ac);background:var(--ac-soft);color:var(--ac);font-weight:700;transition:all .5s var(--ease)}
+.tour:hover{box-shadow:0 8px 26px var(--ac-glow);transform:translateY(-2px)}
+.tour.on{background:var(--ac);color:var(--on-ac);box-shadow:0 0 28px var(--ac-glow)}
+.tour.on #tico{animation:blink 1s steps(2) infinite}@keyframes blink{50%{opacity:.3}}
+.engine{cursor:pointer;-webkit-user-select:none;user-select:none}
+.engine.boost .eo{animation-duration:1.6s!important}
+.engine.boost .ecore{filter:drop-shadow(0 0 60px var(--ac))}
+.engine.boost .etag{animation:pop .6s var(--ease)}@keyframes pop{40%{transform:scale(1.18) translateX(var(--tw,0))}}
+.engine .etag[style*="left:50%"]{--tw:-50%}
+.hint{position:absolute;bottom:-30px;inset-inline:0;text-align:center;font-size:12.5px;color:var(--mute)}
+
+/* ===================== RESPONSIVE ===================== */
+@media (max-width:1100px){.nav nav{display:none}}
+@media (max-width:1024px){
+  .two,.idh-card{grid-template-columns:1fr}.idh-card{padding:34px 26px}.stage3d{max-width:460px;margin:0 auto}.deck{grid-template-columns:repeat(2,1fr)}
+  .engine{width:min(100%,420px)}.snap{min-height:auto}
+}
+@media (max-width:820px){
+  .dots{display:none}.wrap{padding-inline:max(16px,env(safe-area-inset-left)) max(16px,env(safe-area-inset-right))}
+  .strip{grid-template-columns:1fr}.arrow{width:2px;height:28px;margin:8px auto;background:repeating-linear-gradient(180deg,var(--ac) 0 6px,transparent 6px 12px);animation:none}
+  .conn{grid-template-columns:1fr}.idh-wrap{border-radius:30px}.idh-card{border-radius:28px;padding:26px 16px}.idh-card::before{border-radius:20px}
+  .deck{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:14px;margin-inline:-16px;padding:0 16px 14px;scrollbar-width:none}
+  .deck::-webkit-scrollbar{display:none}.card{flex:0 0 80%;max-width:330px;scroll-snap-align:center}
+  .lang{max-width:96px;padding:0 8px}.tgl{width:58px}.tgl[aria-pressed=true] span{transform:translateX(22px)}[dir=rtl] .tgl[aria-pressed=true] span{transform:translateX(-22px)}
+  .brand{letter-spacing:.2em;font-size:15px}
+}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<header class="nav"><div class="wrap">
+  <div class="brand">AIXE<b>LINK</b></div>
+  <nav><a href="#architecture" data-i18n="n_arch"></a><a href="#ace" data-i18n="n_ace"></a><a href="#idh">IDH</a><a href="#claira">CLAIRA</a><a href="#products" data-i18n="n_prod"></a></nav>
+  <div class="ctl">
+    <select class="lang" id="lang"><option value="en">English</option><option value="fr">Français</option><option value="ar">العربية</option><option value="de">Deutsch</option><option value="nl">Nederlands</option><option value="th">ไทย</option></select>
+    <button class="tgl" id="theme" aria-pressed="false"><span id="ico">☀</span></button>
+  </div>
+</div></header>
+<nav class="dots" id="dots"></nav>
+<canvas id="fx"></canvas><div class="glow"></div>
+
+<!-- ============ HERO ============ -->
+<section class="snap hero" id="hero"><div class="wrap">
+  <span class="eyebrow"><i></i><span data-i18n="eb"></span></span>
+  <h1><span data-i18n="h1a"></span><span data-i18n="h1b"></span></h1>
+  <p class="lead" data-i18n="lead"></p>
+  <div class="ctas"><a class="btn pri" href="#architecture" data-i18n="cta1"></a><a class="btn sec" href="#contact" data-i18n="cta2"></a></div>
+  <div class="strip">
+    <div class="blk glass"><h3 data-i18n="s1"></h3><div class="tags"><span class="tag">EMR / HIS</span><span class="tag">PACS</span><span class="tag">LIS</span><span class="tag" data-i18n="s1t"></span></div></div>
+    <div class="arrow"></div>
+    <div class="blk glass mid"><h3 data-i18n="s2"></h3><b>ACE + IDH</b></div>
+    <div class="arrow"></div>
+    <div class="blk glass"><h3 data-i18n="s3"></h3><div class="tags"><span class="tag">icuCare</span><span class="tag">orCare</span><span class="tag">edCare</span><span class="tag">ECG</span><span class="tag">ivCare</span><span class="tag">CLAIRA</span></div></div>
+  </div>
+</div></section>
+
+<!-- ============ DIKW ARCHITECTURE (diagram + detail share one viewport) ============ -->
+<section class="snap" id="architecture"><div class="wrap arch">
+  <div class="hexbox glass">
+    <span class="hud l">DIKW</span><span class="hud r" id="hud"></span>
+    <svg id="dikw" viewBox="0 0 830 830" role="group" aria-label="DIKW"></svg>
+  </div>
+  <div class="side">
+    <h2 data-i18n="a_h2"></h2>
+    <p class="lead" data-i18n="a_lead"></p>
+    <button class="tour" id="tour"><span id="tico">▶</span><span id="tlab" data-i18n="tour_s"></span></button>
+    <div class="layers" id="layers"></div>
+    <div class="detail glass" id="detail" role="region" aria-live="polite">
+      <button class="xbtn" id="xbtn" aria-label="Close">✕</button>
+      <div class="media"><img id="dimg" alt="" referrerpolicy="no-referrer"><span class="k" id="dk"></span></div>
+      <div class="dbody">
+        <div class="status"><i></i><span id="stat"></span></div>
+        <div class="crumb" id="crumb"></div>
+        <h3 id="dt"></h3><p class="dsub" id="dsub"></p><p id="dd"></p>
+        <div class="label" id="dlabel" hidden></div><div class="tags" id="dtags"></div>
+        <div><span class="works" id="dworks" hidden></span></div>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<!-- ============ ACE: AIXELINK COMPUTE ENGINE ============ -->
+<section class="snap" id="ace"><div class="wrap two">
+  <div>
+    <span class="eyebrow"><i></i><span data-i18n="ace_eb"></span></span>
+    <h2 class="metal">ACE</h2>
+    <p class="sub">AIXELINK COMPUTE ENGINE</p>
+    <p class="lead" data-i18n="ace_lead"></p>
+    <div class="ints"><div class="label" data-i18n="ace_int"></div><div class="tags"><span class="tag">EMR / HIS</span><span class="tag">PACS</span><span class="tag">LIS</span><span class="tag">HL7</span><span class="tag">FHIR</span><span class="tag">DICOM</span><span class="tag">REST API</span></div></div>
+  </div>
+  <div class="engine">
+    <svg viewBox="0 0 400 400" aria-label="ACE engine">
+      <defs><linearGradient id="metal2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:var(--m1)"/><stop offset=".5" style="stop-color:var(--m2)"/><stop offset="1" style="stop-color:var(--m3)"/></linearGradient></defs>
+      <circle cx="200" cy="200" r="185" class="eo c"/><circle cx="200" cy="200" r="145" class="eo b"/><circle cx="200" cy="200" r="105" class="eo"/>
+      <polygon points="200,128 262,164 262,236 200,272 138,236 138,164" class="ecore"/>
+      <text x="200" y="212" class="etxt">ACE</text><text x="200" y="240" class="esub">COMPUTE ENGINE</text>
+      <circle r="5" fill="var(--ac)"><animateMotion dur="9s" repeatCount="indefinite" path="M95,200 a105,105 0 1,0 210,0 a105,105 0 1,0 -210,0"/></circle>
+      <circle r="4" fill="var(--ac)"><animateMotion dur="14s" repeatCount="indefinite" path="M55,200 a145,145 0 1,1 290,0 a145,145 0 1,1 -290,0"/></circle>
+      <circle r="4" fill="var(--vi)"><animateMotion dur="20s" repeatCount="indefinite" path="M15,200 a185,185 0 1,0 370,0 a185,185 0 1,0 -370,0"/></circle>
+    </svg>
+    <span class="etag" style="top:1%;left:50%;transform:translateX(-50%)"><i></i><span data-i18n="e1"></span></span>
+    <span class="etag" style="top:47%;inset-inline-end:-2%"><i></i><span data-i18n="e2"></span></span>
+    <span class="etag" style="bottom:1%;left:50%;transform:translateX(-50%)"><i></i><span data-i18n="e3"></span></span>
+    <span class="etag" style="top:47%;inset-inline-start:-2%"><i></i><span data-i18n="e4"></span></span>
+    <span class="hint" data-i18n="e_hint"></span>
+  </div>
+</div></section>
+
+<!-- ============ IDH CARD ============ -->
+<section class="snap" id="idh"><div class="wrap">
+  <div class="idh-wrap"><div class="idh-card">
+    <div>
+      <span class="eyebrow"><i></i><span data-i18n="idh_eb"></span></span>
+      <h2 class="metal">IDH</h2>
+      <p class="sub" data-i18n="idh_sub"></p>
+      <p class="lead" style="font-size:16px" data-i18n="idh_lead"></p>
+      <div class="conn">
+        <div class="cbox"><b data-i18n="c1b"></b><span data-i18n="c1s"></span></div>
+        <div class="cbox net"><b data-i18n="c2b"></b><span data-i18n="c2s"></span></div>
+      </div>
+      <div class="tags"><span class="tag" data-i18n="i_alu"></span><span class="tag" data-i18n="i_therm"></span><span class="tag" data-i18n="i_comp"></span></div>
+    </div>
+    <div class="stage3d" id="stage3d"><div class="tilt" id="tilt"><div class="float">
+      <div class="sh"></div>
+      <svg viewBox="0 0 400 300" fill="none" aria-label="IDH">
+        <defs><linearGradient id="al" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:var(--m1)"/><stop offset=".5" style="stop-color:var(--m3)"/><stop offset="1" style="stop-color:var(--m2)"/></linearGradient>
+        <linearGradient id="tp" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".8"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient></defs>
+        <path d="M60 150 L200 100 L340 150 L340 200 L200 250 L60 200Z" fill="url(#al)" stroke="var(--line)" stroke-width="1.5" stroke-linejoin="round"/>
+        <path d="M60 150 L200 100 L340 150 L200 200Z" fill="url(#tp)" opacity=".9"/>
+        <path d="M60 150 L200 200 L200 250 L60 200Z" fill="var(--m2)" opacity=".35"/>
+        <rect x="90" y="196" width="80" height="6" rx="3" fill="var(--ac)" transform="skewY(18)"/>
+        <circle cx="300" cy="186" r="6" fill="var(--ac)"/><circle cx="300" cy="186" r="12" stroke="var(--ac)" opacity=".4"/>
+      </svg>
+      <span class="fchip" style="inset-inline-start:0;top:12%"><i></i><span data-i18n="f1"></span></span>
+      <span class="fchip" style="inset-inline-end:0;top:30%"><i></i><span data-i18n="f2"></span></span>
+      <span class="fchip" style="inset-inline-start:6%;bottom:14%"><i></i><span data-i18n="f3"></span></span>
+    </div></div></div>
+  </div></div>
+</div></section>
+
+<!-- ============ CLAIRA SHOWCASE ============ -->
+<section class="snap" id="claira"><div class="wrap two">
+  <div>
+    <span class="eyebrow"><i></i><span data-i18n="cla_eb"></span></span>
+    <h2 class="metal">CLAIRA</h2>
+    <p class="lead" data-i18n="cla_lead"></p>
+    <div class="feat"><span class="tag">24/7/365</span><span class="tag" data-i18n="cf2"></span><span class="tag" data-i18n="cf3"></span></div>
+  </div>
+  <div class="phone"><div>
+    <div class="ph-h"><span>CLAIRA</span><small id="listen"></small></div>
+    <div class="wave" id="wave"></div>
+    <div class="bub u" id="bu"></div><div class="bub a" id="ba"></div>
+    <button class="mic" id="mic" aria-label="Mic">🎙</button>
+    <div class="note" data-i18n="cd_note"></div>
+  </div></div>
+</div></section>
+
+<!-- ============ PRODUCT LINE ============ -->
+<section class="snap" id="products"><div class="wrap">
+  <div class="sec-head"><h2 data-i18n="p_h2"></h2><p class="lead" data-i18n="p_lead"></p></div>
+  <div class="cat" data-i18n="cat1"></div><div class="deck" id="deck1"></div>
+  <div class="cat" data-i18n="cat2"></div><div class="deck" id="deck2"></div>
+</div></section>
+
+<footer id="contact"><div class="wrap" data-i18n="f"></div></footer>
+
+<script>
+/* ============ i18n DICTIONARY: [EN, FR, AR, DE, NL, TH] ============ */
+const LANGS=['en','fr','ar','de','nl','th'];
+const T={
+n_arch:['Architecture','Architecture','البنية','Architektur','Architectuur','สถาปัตยกรรม'],
+n_ace:['ACE Engine','Moteur ACE','محرك ACE','ACE Engine','ACE-engine','เอนจิน ACE'],
+n_prod:['Products','Produits','المنتجات','Produkte','Producten','ผลิตภัณฑ์'],
+eb:['UNIVERSAL MODULAR MIDDLEWARE','MIDDLEWARE MODULAIRE UNIVERSEL','برمجيات وسيطة معيارية شاملة','UNIVERSELLE MODULARE MIDDLEWARE','UNIVERSELE MODULAIRE MIDDLEWARE','มิดเดิลแวร์โมดูลาร์สากล'],
+h1a:['One intelligence layer.',"Une couche d'intelligence.",'طبقة ذكاء واحدة.','Eine Intelligenzschicht.','Eén intelligentielaag.','ชั้นปัญญาเดียว'],
+h1b:['Every system you already run.','Tous les systèmes que vous utilisez déjà.','لكل نظام تعمل به بالفعل.','Jedes System, das Sie bereits nutzen.','Elk systeem dat u al gebruikt.','เชื่อมทุกระบบที่คุณใช้อยู่'],
+lead:['ACE, the IDH bedside hub and the CLAIRA assistant connect to your EMR/HIS, PACS, LIS and bedside devices, turning real-time data into proactive care with no rip-and-replace.',
+"ACE, le hub de chevet IDH et l'assistant CLAIRA se connectent à votre DPI/SIH, PACS, LIS et aux dispositifs de chevet, et transforment les données en temps réel en soins proactifs, sans remplacer l'existant.",
+'يتصل ACE ومحور IDH عند السرير ومساعد CLAIRA بنظام السجلات الطبية/معلومات المستشفى وPACS وLIS وأجهزة السرير، ليحوّل البيانات اللحظية إلى رعاية استباقية دون استبدال أنظمتكم الحالية.',
+'ACE, der IDH-Hub am Krankenbett und der Assistent CLAIRA verbinden sich mit Ihrem KIS, PACS, LIS und den Geräten am Bett und machen aus Echtzeitdaten proaktive Versorgung, ganz ohne Austausch bestehender Systeme.',
+'ACE, de IDH-hub aan het bed en de assistent CLAIRA koppelen aan uw EPD/ZIS, PACS, LIS en bedapparatuur en maken van realtimedata proactieve zorg, zonder uw bestaande systemen te vervangen.',
+'ACE, IDH ที่ข้างเตียง และผู้ช่วย CLAIRA เชื่อมต่อกับ EMR/HIS, PACS, LIS และอุปกรณ์ข้างเตียงของคุณ เปลี่ยนข้อมูลเรียลไทม์ให้เป็นการดูแลเชิงรุก โดยไม่ต้องรื้อระบบเดิม'],
+cta1:['See how it plugs in',"Voir comment il s'intègre",'اكتشف كيف يندمج','So fügt es sich ein','Zie hoe het aansluit','ดูวิธีเชื่อมต่อ'],
+cta2:['Talk to an Integration Expert','Parler à un expert en intégration','تحدث مع خبير تكامل','Mit einem Integrationsexperten sprechen','Praat met een integratie-expert','คุยกับผู้เชี่ยวชาญด้านการเชื่อมต่อ'],
+s1:['YOUR EXISTING SYSTEMS','VOS SYSTÈMES EXISTANTS','أنظمتكم الحالية','IHRE BESTEHENDEN SYSTEME','UW BESTAANDE SYSTEMEN','ระบบเดิมของคุณ'],
+s1t:['Bedside devices','Dispositifs de chevet','أجهزة السرير','Geräte am Bett','Bedapparatuur','อุปกรณ์ข้างเตียง'],
+s2:['PLUG-AND-PLAY MIDDLEWARE','MIDDLEWARE PLUG-AND-PLAY','برمجيات وسيطة جاهزة للتوصيل','PLUG-AND-PLAY-MIDDLEWARE','PLUG-AND-PLAY MIDDLEWARE','มิดเดิลแวร์พร้อมใช้งาน'],
+s3:['CLINICAL SOFTWARE & AI','LOGICIELS CLINIQUES ET IA','البرمجيات السريرية والذكاء الاصطناعي','KLINISCHE SOFTWARE & KI','KLINISCHE SOFTWARE & AI','ซอฟต์แวร์คลินิกและ AI'],
+a_h2:['From data to wisdom, in four layers.','Des données à la sagesse, en quatre couches.','من البيانات إلى الحكمة في أربع طبقات.','Von Daten zu Weisheit in vier Schichten.','Van data naar wijsheid in vier lagen.','จากข้อมูลสู่ปัญญา ใน 4 ชั้น'],
+a_lead:['Select a layer or a product to trace where it lives and how it connects.','Sélectionnez une couche ou un produit pour voir sa place et ses connexions.','اختر طبقة أو منتجاً لتتبع موقعه وكيفية اتصاله.','Wählen Sie eine Schicht oder ein Produkt, um Position und Verbindungen zu sehen.','Kies een laag of product om te zien waar het past en hoe het verbindt.','เลือกชั้นหรือผลิตภัณฑ์เพื่อดูตำแหน่งและการเชื่อมต่อ'],
+hud_i:['STANDBY','VEILLE','الاستعداد','STANDBY','STAND-BY','สแตนด์บาย'],
+hud_l:['LINK ACTIVE','LIAISON ACTIVE','الاتصال نشط','VERBINDUNG AKTIV','VERBINDING ACTIEF','เชื่อมต่อแล้ว'],
+st_i:['SYSTEM IDLE','SYSTÈME EN VEILLE','النظام في وضع الخمول','SYSTEM INAKTIV','SYSTEEM IN RUST','ระบบว่าง'],
+st_c:['CONNECTED','CONNECTÉ','متصل','VERBUNDEN','VERBONDEN','เชื่อมต่อแล้ว'],
+pi_t:['Select a layer or product','Sélectionnez une couche ou un produit','اختر طبقة أو منتجاً','Schicht oder Produkt wählen','Kies een laag of product','เลือกชั้นหรือผลิตภัณฑ์'],
+pi_s:['Establish connection via layer or module selection','Établissez la connexion en sélectionnant une couche ou un module','ابدأ الاتصال باختيار طبقة أو وحدة','Verbindung per Schicht- oder Modulauswahl herstellen','Maak verbinding via een laag of module','เชื่อมต่อโดยเลือกชั้นหรือโมดูล'],
+pi_d:['Data becomes information, information becomes knowledge, and knowledge becomes wisdom.',"Les données deviennent information, l'information devient connaissance, la connaissance devient sagesse.",'تتحول البيانات إلى معلومات، والمعلومات إلى معرفة، والمعرفة إلى حكمة.','Daten werden zu Information, Information zu Wissen und Wissen zu Weisheit.','Data wordt informatie, informatie wordt kennis en kennis wordt wijsheid.','ข้อมูลกลายเป็นสารสนเทศ สารสนเทศกลายเป็นความรู้ และความรู้กลายเป็นปัญญา'],
+lbl_c:['CONNECTS TO','SE CONNECTE À','يتصل بـ','VERBINDET MIT','VERBINDT MET','เชื่อมต่อกับ'],
+lbl_p:['PRODUCTS IN THIS LAYER','PRODUITS DE CETTE COUCHE','منتجات هذه الطبقة','PRODUKTE IN DIESER SCHICHT','PRODUCTEN IN DEZE LAAG','ผลิตภัณฑ์ในชั้นนี้'],
+wk:['Works with:','Compatible avec :','يعمل مع:','Kompatibel mit:','Werkt met:','ใช้งานร่วมกับ:'],
+ww_cla:['Any existing hospital software','Tout logiciel hospitalier existant','أي برنامج قائم في المستشفى','Jede bestehende Krankenhaussoftware','Elke bestaande ziekenhuissoftware','ซอฟต์แวร์โรงพยาบาลเดิมทุกระบบ'],
+ww_idh:['Bedside devices · IP streams','Dispositifs de chevet · flux IP','أجهزة السرير · تدفقات IP','Geräte am Bett · IP-Streams','Bedapparatuur · IP-streams','อุปกรณ์ข้างเตียง · สตรีม IP'],
+Ldn:['Data Layer','Couche Données','طبقة البيانات','Datenschicht','Datalaag','ชั้นข้อมูล'],
+Lds:['Foundation','Fondation','الأساس','Fundament','Fundament','รากฐาน'],
+Ldd:['IDH captures bedside data in real time and ACE unifies and processes it.','IDH capte les données au chevet en temps réel et ACE les unifie et les traite.','يلتقط IDH بيانات السرير لحظياً ويوحّدها ACE ويعالجها.','IDH erfasst Daten am Krankenbett in Echtzeit, ACE vereinheitlicht und verarbeitet sie.','IDH legt gegevens aan het bed realtime vast; ACE bundelt en verwerkt ze.','IDH เก็บข้อมูลข้างเตียงแบบเรียลไทม์ และ ACE รวมและประมวลผลข้อมูล'],
+Lin:['Information Layer','Couche Information','طبقة المعلومات','Informationsschicht','Informatielaag','ชั้นสารสนเทศ'],
+Lis:['Clinical Applications','Applications cliniques','التطبيقات السريرية','Klinische Anwendungen','Klinische toepassingen','แอปพลิเคชันคลินิก'],
+Lid:['Clinical software that turns data into workflows for the ICU, OR, ED and your own needs.','Des logiciels cliniques qui transforment les données en flux de travail pour la réanimation, le bloc, les urgences et vos besoins propres.','برمجيات سريرية تحوّل البيانات إلى مسارات عمل للعناية المركزة وغرف العمليات والطوارئ واحتياجاتكم الخاصة.','Klinische Software, die Daten in Abläufe für Intensivstation, OP, Notaufnahme und Ihre eigenen Anforderungen verwandelt.','Klinische software die data omzet in werkprocessen voor IC, OK, SEH en uw eigen behoeften.','ซอฟต์แวร์คลินิกที่เปลี่ยนข้อมูลเป็นเวิร์กโฟลว์สำหรับ ICU ห้องผ่าตัด ห้องฉุกเฉิน และความต้องการเฉพาะของคุณ'],
+Lkn:['Knowledge Layer','Couche Connaissance','طبقة المعرفة','Wissensschicht','Kennislaag','ชั้นความรู้'],
+Lks:['Proactive Hospital Care','Soins hospitaliers proactifs','الرعاية الاستباقية في المستشفى','Proaktive Krankenhausversorgung','Proactieve ziekenhuiszorg','การดูแลโรงพยาบาลเชิงรุก'],
+Lkd:['Predictive insight, smart workflow and enterprise orchestration across Ward, ICU and Emergency leadership.',"Prédiction, workflow intelligent et orchestration à l'échelle de l'établissement, du service, de la réanimation et des urgences.",'رؤى تنبؤية وسير عمل ذكي وتنسيق على مستوى المؤسسة عبر الأجنحة والعناية المركزة وقيادة الطوارئ.','Prädiktive Erkenntnisse, smarter Workflow und unternehmensweite Orchestrierung für Station, Intensiv und Notaufnahme.','Voorspellende inzichten, slimme workflow en ziekenhuisbrede orkestratie voor afdeling, IC en SEH.','ข้อมูลเชิงพยากรณ์ เวิร์กโฟลว์อัจฉริยะ และการประสานงานระดับองค์กรครอบคลุมหอผู้ป่วย ICU และผู้นำฝ่ายฉุกเฉิน'],
+Lwn:['Wisdom Layer','Couche Sagesse','طبقة الحكمة','Weisheitsschicht','Wijsheidslaag','ชั้นปัญญา'],
+Lws:['AI Intelligence','Intelligence IA','ذكاء اصطناعي','KI-Intelligenz','AI-intelligentie','ปัญญา AI'],
+Lwd:['CLAIRA, the speech-activated clinical AI assistant, plugs into any hospital software.',"CLAIRA, l'assistant clinique IA à commande vocale, se branche sur n'importe quel logiciel hospitalier.",'CLAIRA، المساعد السريري الذكي المُفعّل بالصوت، يندمج مع أي برنامج في المستشفى.','CLAIRA, der sprachgesteuerte klinische KI-Assistent, lässt sich in jede Krankenhaussoftware einbinden.','CLAIRA, de spraakgestuurde klinische AI-assistent, koppelt aan elke ziekenhuissoftware.','CLAIRA ผู้ช่วย AI ทางคลินิกที่สั่งงานด้วยเสียง เชื่อมต่อกับซอฟต์แวร์โรงพยาบาลได้ทุกระบบ'],
+d_idh:['Bedside hub that captures, forwards and stores vitals in real time. Connects up to 6 distinct types of medical devices at once (e.g. bedside monitors, ventilators); network devices like infusion pumps are unlimited via IP streams.',
+'Hub de chevet qui capte, transmet et stocke les constantes en temps réel. Connecte jusqu\'à 6 types distincts de dispositifs médicaux simultanément (moniteurs, ventilateurs) ; les appareils réseau comme les pompes à perfusion sont illimités via flux IP.',
+'محور عند سرير المريض يلتقط العلامات الحيوية ويحوّلها ويخزّنها لحظياً. يتصل بما يصل إلى 6 أنواع مختلفة من الأجهزة الطبية في وقت واحد (مثل أجهزة المراقبة وأجهزة التنفس)، أما الأجهزة الشبكية كمضخات التسريب فغير محدودة العدد عبر تدفقات IP.',
+'Hub am Krankenbett, der Vitaldaten in Echtzeit erfasst, weiterleitet und speichert. Verbindet gleichzeitig bis zu 6 verschiedene Gerätetypen (z. B. Monitore, Beatmungsgeräte); Netzwerkgeräte wie Infusionspumpen sind per IP-Stream unbegrenzt.',
+'Hub aan het bed die vitale waarden realtime vastlegt, doorstuurt en opslaat. Koppelt tot 6 verschillende soorten medische apparaten tegelijk (bijv. monitoren, beademingsapparaten); netwerkapparaten zoals infuuspompen zijn onbeperkt via IP-streams.',
+'ฮับข้างเตียงที่เก็บ ส่งต่อ และจัดเก็บสัญญาณชีพแบบเรียลไทม์ เชื่อมต่ออุปกรณ์การแพทย์ได้พร้อมกันสูงสุด 6 ประเภท (เช่น เครื่องติดตามสัญญาณชีพ เครื่องช่วยหายใจ) ส่วนอุปกรณ์เครือข่ายอย่างปั๊มให้สารน้ำเชื่อมต่อผ่านสตรีม IP ได้ไม่จำกัดจำนวน'],
+d_ace:['The core care software engine that unifies, processes and optimizes real-time data as plug-and-play middleware.','Le moteur logiciel de soins qui unifie, traite et optimise les données en temps réel, en middleware plug-and-play.','المحرك البرمجي الأساسي للرعاية الذي يوحّد البيانات اللحظية ويعالجها ويحسّنها كبرمجيات وسيطة جاهزة للتوصيل.','Die zentrale Software-Engine der Versorgung: vereinheitlicht, verarbeitet und optimiert Echtzeitdaten als Plug-and-play-Middleware.','De kernsoftware-engine voor zorg die realtimedata bundelt, verwerkt en optimaliseert als plug-and-play middleware.','เอนจินซอฟต์แวร์หลักด้านการดูแลที่รวม ประมวลผล และปรับให้เหมาะสมกับข้อมูลเรียลไทม์ ในรูปแบบมิดเดิลแวร์พร้อมใช้งาน'],
+d_icu:['Specialized clinical workflow for high-acuity ICU environments.','Flux de travail clinique spécialisé pour les unités de soins intensifs à forte acuité.','مسار عمل سريري متخصص لبيئات العناية المركزة عالية الحدة.','Spezialisierter klinischer Workflow für Intensivstationen mit hohem Schweregrad.','Gespecialiseerde klinische workflow voor hoogacute IC-omgevingen.','เวิร์กโฟลว์ทางคลินิกเฉพาะทางสำหรับ ICU ที่มีผู้ป่วยวิกฤต'],
+d_or:['Complete surgical orchestration: Pre-Op, Intra-Op, Post-Op and OR scheduling.','Orchestration chirurgicale complète : pré-, per- et post-opératoire et planification du bloc.','تنسيق جراحي متكامل: قبل العملية وأثناءها وبعدها وجدولة غرف العمليات.','Komplette OP-Orchestrierung: prä-, intra- und postoperativ sowie OP-Planung.','Complete chirurgische orkestratie: pre-, intra- en postoperatief plus OK-planning.','การประสานงานผ่าตัดครบวงจร: ก่อน ระหว่าง หลังผ่าตัด และการจัดตารางห้องผ่าตัด'],
+d_ed:['Emergency department synchronization for rapid care delivery.','Synchronisation des urgences pour une prise en charge rapide.','مزامنة قسم الطوارئ لتقديم رعاية سريعة.','Synchronisation der Notaufnahme für schnelle Versorgung.','Synchronisatie van de spoedeisende hulp voor snelle zorg.','ประสานงานห้องฉุกเฉินเพื่อการดูแลที่รวดเร็ว'],
+d_ecg:['ECG management built into the clinical workflow.','Gestion des ECG intégrée au flux de travail clinique.','إدارة تخطيط القلب مدمجة في مسار العمل السريري.','EKG-Management, integriert in den klinischen Workflow.','ECG-beheer geïntegreerd in de klinische workflow.','การจัดการ ECG ที่ผนวกอยู่ในเวิร์กโฟลว์ทางคลินิก'],
+d_iv:['Advanced IV and infusion management.','Gestion avancée des perfusions et voies IV.','إدارة متقدمة للتسريب الوريدي والمحاليل.','Fortschrittliches IV- und Infusionsmanagement.','Geavanceerd IV- en infuusbeheer.','การจัดการสารน้ำและการให้ยาทางหลอดเลือดขั้นสูง'],
+d_cus:['Tailored clinical workflows, such as EWS scoring.','Flux de travail cliniques sur mesure, comme le score EWS.','مسارات عمل سريرية مخصصة، مثل احتساب مؤشر الإنذار المبكر EWS.','Maßgeschneiderte klinische Workflows, z. B. EWS-Scoring.','Klinische workflows op maat, zoals EWS-scoring.','เวิร์กโฟลว์ทางคลินิกที่ออกแบบเฉพาะ เช่น การให้คะแนน EWS'],
+d_vit:['Early-warning insight that helps teams move from reactive to proactive care.','Alertes précoces qui aident les équipes à passer de soins réactifs à proactifs.','رؤى إنذار مبكر تساعد الفرق على الانتقال من الرعاية التفاعلية إلى الاستباقية.','Frühwarn-Erkenntnisse, die Teams von reaktiver zu proaktiver Versorgung führen.','Vroegsignalering die teams helpt van reactieve naar proactieve zorg.','ข้อมูลเตือนล่วงหน้าที่ช่วยทีมเปลี่ยนจากการดูแลเชิงรับเป็นเชิงรุก'],
+d_flow:['Real-time allocation of staff and resources to cut operational friction.','Allocation en temps réel du personnel et des ressources pour réduire les frictions.','توزيع لحظي للكوادر والموارد لتقليل العوائق التشغيلية.','Echtzeit-Zuweisung von Personal und Ressourcen gegen operative Reibung.','Realtime inzet van personeel en middelen om frictie te verminderen.','จัดสรรบุคลากรและทรัพยากรแบบเรียลไทม์ ลดอุปสรรคในการปฏิบัติงาน'],
+d_ent:['Enterprise care orchestration across Ward, ICU and Emergency leadership.',"Orchestration des soins à l'échelle de l'établissement : service, réanimation et urgences.",'تنسيق الرعاية على مستوى المؤسسة عبر الأجنحة والعناية المركزة وقيادة الطوارئ.','Unternehmensweite Versorgungssteuerung für Station, Intensiv und Notaufnahmeleitung.','Zorgorkestratie voor het hele ziekenhuis: afdeling, IC en SEH-leiding.','การประสานงานการดูแลระดับองค์กรครอบคลุมหอผู้ป่วย ICU และผู้นำฝ่ายฉุกเฉิน'],
+d_cla:['A 24/7/365 speech-activated clinical AI assistant for doctors and nurses, as a universal plug-in for any hospital software.','Assistant clinique IA à commande vocale 24h/24, 7j/7, 365j/an pour médecins et infirmiers, plug-in universel pour tout logiciel hospitalier.','مساعد سريري ذكي يعمل بالصوت على مدار الساعة طوال أيام السنة للأطباء والممرضين، وإضافة شاملة لأي برنامج في المستشفى.','Sprachgesteuerter klinischer KI-Assistent für Ärzte und Pflegekräfte, 24/7/365, als universelles Plug-in für jede Krankenhaussoftware.','Spraakgestuurde klinische AI-assistent voor artsen en verpleegkundigen, 24/7/365, als universele plug-in voor elke ziekenhuissoftware.','ผู้ช่วย AI ทางคลินิกที่สั่งงานด้วยเสียงตลอด 24/7/365 สำหรับแพทย์และพยาบาล เป็นปลั๊กอินสากลสำหรับซอฟต์แวร์โรงพยาบาลทุกระบบ'],
+d_phc:['The outcome of the stack: care teams act before problems escalate.',"Le résultat de l'ensemble : les équipes agissent avant que les problèmes ne s'aggravent.",'ثمرة المنظومة: تتحرك فرق الرعاية قبل تفاقم المشكلات.','Das Ergebnis des Stacks: Teams handeln, bevor Probleme eskalieren.','Het resultaat van de stack: zorgteams grijpen in voordat problemen escaleren.','ผลลัพธ์ของระบบทั้งหมด: ทีมดูแลลงมือก่อนปัญหาจะบานปลาย'],
+d_ca:['Mobile clinical assistant for doctors and nurses at the point of care.','Assistant clinique mobile pour médecins et infirmiers au chevet du patient.','مساعد سريري على الهاتف للأطباء والممرضين عند نقطة الرعاية.','Mobiler klinischer Assistent für Ärzte und Pflegekräfte am Point of Care.','Mobiele klinische assistent voor artsen en verpleegkundigen aan het bed.','ผู้ช่วยทางคลินิกบนมือถือสำหรับแพทย์และพยาบาล ณ จุดดูแลผู้ป่วย'],
+d_cb:['Code Blue tracking and response on mobile.','Suivi et réponse Code Blue sur mobile.','تتبع حالات الإنعاش (Code Blue) والاستجابة لها عبر الهاتف.','Code-Blue-Tracking und -Reaktion auf dem Smartphone.','Code Blue-tracking en -respons op mobiel.','ติดตามและตอบสนอง Code Blue บนมือถือ'],
+d_ivl:['Mobile IV and infusion management at the point of care.','Gestion mobile des perfusions au point de soins.','إدارة التسريب الوريدي عبر الهاتف عند نقطة الرعاية.','Mobiles IV- und Infusionsmanagement am Point of Care.','Mobiel IV- en infuusbeheer aan het bed.','จัดการสารน้ำและยาทางหลอดเลือดบนมือถือ ณ จุดดูแลผู้ป่วย'],
+ace_eb:['CORE CARE SOFTWARE ENGINE','MOTEUR LOGICIEL DE SOINS','المحرك البرمجي الأساسي للرعاية','KERN-SOFTWARE-ENGINE DER VERSORGUNG','KERNSOFTWARE-ENGINE VOOR ZORG','เอนจินซอฟต์แวร์หลักด้านการดูแล'],
+ace_lead:['The brain of the system. ACE unifies, processes and optimizes real-time clinical data, then powers every Aixelink application and AI module, with no rip-and-replace.',"Le cerveau du système. ACE unifie, traite et optimise les données cliniques en temps réel, puis alimente chaque application et module IA d'Aixelink, sans remplacement de l'existant.",'عقل المنظومة. يوحّد ACE البيانات السريرية اللحظية ويعالجها ويحسّنها، ثم يشغّل كل تطبيقات Aixelink ووحدات الذكاء الاصطناعي دون استبدال الأنظمة القائمة.','Das Gehirn des Systems. ACE vereinheitlicht, verarbeitet und optimiert klinische Echtzeitdaten und versorgt jede Aixelink-Anwendung und jedes KI-Modul, ganz ohne Austausch bestehender Systeme.','Het brein van het systeem. ACE bundelt, verwerkt en optimaliseert klinische realtimedata en voedt elke Aixelink-applicatie en AI-module, zonder bestaande systemen te vervangen.','สมองของระบบ ACE รวม ประมวลผล และปรับข้อมูลทางคลินิกแบบเรียลไทม์ให้เหมาะสม แล้วขับเคลื่อนทุกแอปพลิเคชันและโมดูล AI ของ Aixelink โดยไม่ต้องรื้อระบบเดิม'],
+ace_int:['INTEGRATES WITH',"S'INTÈGRE À",'يتكامل مع','INTEGRIERT MIT','INTEGREERT MET','เชื่อมต่อกับ'],
+e1:['Unify','Unifier','توحيد','Vereinheitlichen','Bundelen','รวมข้อมูล'],e2:['Process','Traiter','معالجة','Verarbeiten','Verwerken','ประมวลผล'],
+e3:['Optimize','Optimiser','تحسين','Optimieren','Optimaliseren','ปรับให้เหมาะสม'],e4:['Integrate','Intégrer','تكامل','Integrieren','Integreren','เชื่อมต่อ'],
+idh_eb:['BEDSIDE HARDWARE EDGE','MATÉRIEL EN PÉRIPHÉRIE DU CHEVET','عتاد الحافة عند السرير','HARDWARE-EDGE AM BETT','HARDWARE-EDGE AAN HET BED','ฮาร์ดแวร์เอดจ์ข้างเตียง'],
+idh_sub:['Intelligent Device Hub. The data foundation at every bedside.','Intelligent Device Hub. La fondation des données à chaque chevet.','Intelligent Device Hub. أساس البيانات عند كل سرير.','Intelligent Device Hub. Das Datenfundament an jedem Krankenbett.','Intelligent Device Hub. Het datafundament aan elk bed.','Intelligent Device Hub รากฐานข้อมูลที่ทุกเตียง'],
+idh_lead:['Connects up to 6 distinct types of medical devices simultaneously, such as bedside monitors and ventilators. Network-based devices like infusion pumps are not limited in quantity and connect seamlessly via IP network streams.','Connecte jusqu\'à 6 types distincts de dispositifs médicaux simultanément, comme les moniteurs de chevet et les ventilateurs. Les appareils réseau, comme les pompes à perfusion, ne sont pas limités en nombre et se connectent via des flux IP.','يتصل بما يصل إلى 6 أنواع مختلفة من الأجهزة الطبية في وقت واحد، مثل أجهزة مراقبة السرير وأجهزة التنفس. أما الأجهزة الشبكية مثل مضخات التسريب فلا يوجد حد لعددها وتتصل بسلاسة عبر تدفقات شبكة IP.','Verbindet gleichzeitig bis zu 6 verschiedene Typen medizinischer Geräte, etwa Bettmonitore und Beatmungsgeräte. Netzwerkgeräte wie Infusionspumpen sind mengenmäßig unbegrenzt und verbinden sich nahtlos über IP-Netzwerkstreams.','Koppelt tot 6 verschillende soorten medische apparaten tegelijk, zoals bedmonitoren en beademingsapparaten. Netwerkapparaten zoals infuuspompen zijn onbeperkt in aantal en koppelen naadloos via IP-netwerkstreams.','เชื่อมต่ออุปกรณ์การแพทย์ได้พร้อมกันสูงสุด 6 ประเภท เช่น เครื่องติดตามสัญญาณชีพข้างเตียงและเครื่องช่วยหายใจ ส่วนอุปกรณ์เครือข่ายอย่างปั๊มให้สารน้ำไม่จำกัดจำนวน และเชื่อมต่อได้อย่างราบรื่นผ่านสตรีมเครือข่าย IP'],
+c1b:['6 types','6 types','6 أنواع','6 Typen','6 typen','6 ประเภท'],
+c1s:['Bedside monitors, ventilators and more, at once','Moniteurs de chevet, ventilateurs et plus, en même temps','أجهزة المراقبة والتنفس وغيرها في وقت واحد','Bettmonitore, Beatmungsgeräte und mehr gleichzeitig','Bedmonitoren, beademingsapparaten en meer, tegelijk','เครื่องติดตามสัญญาณชีพ เครื่องช่วยหายใจ และอื่น ๆ พร้อมกัน'],
+c2b:['Unlimited','Illimité','غير محدود','Unbegrenzt','Onbeperkt','ไม่จำกัด'],
+c2s:['Infusion pumps and other IP devices, over network streams','Pompes à perfusion et autres appareils IP, via flux réseau','مضخات التسريب وأجهزة IP الأخرى عبر تدفقات الشبكة','Infusionspumpen und andere IP-Geräte über Netzwerkstreams','Infuuspompen en andere IP-apparaten via netwerkstreams','ปั๊มให้สารน้ำและอุปกรณ์ IP อื่น ๆ ผ่านสตรีมเครือข่าย'],
+i_alu:['Anodized aluminum build','Boîtier en aluminium anodisé','هيكل من الألمنيوم المؤكسد','Gehäuse aus eloxiertem Aluminium','Behuizing van geanodiseerd aluminium','ตัวเครื่องอะลูมิเนียมอะโนไดซ์'],
+i_therm:['3D-thermal dissipation','Dissipation thermique 3D','تبديد حراري ثلاثي الأبعاد','3D-Wärmeableitung','3D-warmteafvoer','ระบายความร้อน 3 มิติ'],
+i_comp:['Ultra-compact footprint','Encombrement ultra-compact','حجم فائق الصغر','Ultrakompakte Bauform','Ultracompact formaat','ขนาดกะทัดรัดพิเศษ'],
+f1:['Nurse ID validation',"Validation de l'ID infirmier",'التحقق من هوية الممرض','Pflege-ID-Prüfung','Verpleegkundige-ID-validatie','ตรวจสอบรหัสพยาบาล'],
+f2:['Edge AI','IA en périphérie','ذكاء اصطناعي على الحافة','Edge-KI','Edge-AI','Edge AI'],
+f3:['Voice instructions','Instructions vocales','تعليمات صوتية','Sprachanweisungen','Gesproken instructies','คำแนะนำด้วยเสียง'],
+cla_eb:['CLINICAL AI RESPONSE ASSISTANT','ASSISTANT CLINIQUE DE RÉPONSE IA','مساعد الاستجابة السريرية بالذكاء الاصطناعي','KLINISCHER KI-ANTWORTASSISTENT','KLINISCHE AI-RESPONSEASSISTENT','ผู้ช่วยตอบสนองทางคลินิกด้วย AI'],
+cla_lead:['A speech-activated clinical AI assistant for doctors and nurses, covering ICU and clinical activities. One universal plug-in that works with any existing hospital software system.','Un assistant clinique IA à commande vocale pour médecins et infirmiers, couvrant les soins intensifs et les activités cliniques. Un plug-in universel compatible avec tout système logiciel hospitalier existant.','مساعد سريري ذكي يُفعَّل بالصوت للأطباء والممرضين، يغطي العناية المركزة والأنشطة السريرية. إضافة شاملة واحدة تعمل مع أي نظام برمجي قائم في المستشفى.','Ein sprachgesteuerter klinischer KI-Assistent für Ärzte und Pflegekräfte, der Intensivstation und klinische Abläufe abdeckt. Ein universelles Plug-in für jedes bestehende Krankenhaus-Softwaresystem.','Een spraakgestuurde klinische AI-assistent voor artsen en verpleegkundigen, voor IC en klinische activiteiten. Eén universele plug-in voor elk bestaand ziekenhuissoftwaresysteem.','ผู้ช่วย AI ทางคลินิกที่สั่งงานด้วยเสียงสำหรับแพทย์และพยาบาล ครอบคลุม ICU และกิจกรรมทางคลินิก ปลั๊กอินสากลตัวเดียวที่ใช้ได้กับระบบซอฟต์แวร์โรงพยาบาลเดิมทุกระบบ'],
+cf2:['Speech-activated','À commande vocale','يعمل بالصوت','Sprachgesteuert','Spraakgestuurd','สั่งงานด้วยเสียง'],
+cf3:['Plugs into any hospital software','S\'intègre à tout logiciel hospitalier','يندمج مع أي برنامج في المستشفى','Passt in jede Krankenhaussoftware','Past in elke ziekenhuissoftware','เชื่อมต่อกับซอฟต์แวร์โรงพยาบาลทุกระบบ'],
+cd_listen:['Listening…','À l\'écoute…','جارٍ الاستماع…','Hört zu …','Luistert…','กำลังฟัง…'],
+cd_note:['Illustrative demo','Démo illustrative','عرض توضيحي','Illustrative Demo','Illustratieve demo','ตัวอย่างประกอบ'],
+cd_p1:['Show the latest vitals for bed 4','Affiche les dernières constantes du lit 4','اعرض آخر العلامات الحيوية للسرير 4','Zeige die aktuellen Vitalwerte von Bett 4','Toon de laatste vitale waarden van bed 4','แสดงสัญญาณชีพล่าสุดของเตียง 4'],
+cd_r1:['Latest vitals for bed 4 are on screen.','Les dernières constantes du lit 4 sont à l\'écran.','آخر العلامات الحيوية للسرير 4 معروضة على الشاشة.','Die aktuellen Vitalwerte von Bett 4 sind auf dem Bildschirm.','De laatste vitale waarden van bed 4 staan op het scherm.','แสดงสัญญาณชีพล่าสุดของเตียง 4 บนหน้าจอแล้ว'],
+cd_p2:['Start the Code Blue protocol','Lance le protocole Code Blue','ابدأ بروتوكول Code Blue','Code-Blue-Protokoll starten','Start het Code Blue-protocol','เริ่มโปรโตคอล Code Blue'],
+cd_r2:['Code Blue started. Team notified.','Code Blue lancé. Équipe alertée.','بدأ Code Blue وتم إشعار الفريق.','Code Blue gestartet. Team benachrichtigt.','Code Blue gestart. Team gewaarschuwd.','เริ่ม Code Blue แล้ว แจ้งทีมเรียบร้อย'],
+p_h2:['The Aixelink product line.','La gamme de produits Aixelink.','منتجات Aixelink.','Die Aixelink-Produktlinie.','Het Aixelink-productaanbod.','ผลิตภัณฑ์ของ Aixelink'],
+p_lead:['Clinical software for every care setting, on the web and in your pocket.','Des logiciels cliniques pour chaque contexte de soins, sur le web et dans votre poche.','برمجيات سريرية لكل بيئة رعاية، على الويب وفي جيبك.','Klinische Software für jedes Versorgungsumfeld, im Web und in der Hosentasche.','Klinische software voor elke zorgsetting, op het web en in uw broekzak.','ซอฟต์แวร์คลินิกสำหรับทุกบริบทการดูแล ทั้งบนเว็บและบนมือถือ'],
+cat1:['SOFTWARE WEB','LOGICIELS WEB','برمجيات الويب','WEB-SOFTWARE','WEBSOFTWARE','ซอฟต์แวร์เว็บ'],
+cat2:['MOBILE CLINICAL ASSISTANT','ASSISTANT CLINIQUE MOBILE','المساعد السريري على الهاتف','MOBILER KLINISCHER ASSISTENT','MOBIELE KLINISCHE ASSISTENT','ผู้ช่วยทางคลินิกบนมือถือ'],
+view:['View in architecture','Voir dans l\'architecture','عرض في البنية','In der Architektur ansehen','Bekijk in architectuur','ดูในสถาปัตยกรรม'],
+f:['© Aixelink Sàrl 2026 · Plug-and-play AI middleware for modern hospitals','© Aixelink Sàrl 2026 · Middleware IA plug-and-play pour les hôpitaux modernes','© Aixelink Sàrl 2026 · برمجيات وسيطة ذكية جاهزة للتوصيل للمستشفيات الحديثة','© Aixelink Sàrl 2026 · Plug-and-play-KI-Middleware für moderne Krankenhäuser','© Aixelink Sàrl 2026 · Plug-and-play AI-middleware voor moderne ziekenhuizen','© Aixelink Sàrl 2026 · มิดเดิลแวร์ AI พร้อมใช้งานสำหรับโรงพยาบาลสมัยใหม่'],
+aria_t:['Toggle dark mode','Basculer le mode sombre','تبديل الوضع الداكن','Dunkelmodus umschalten','Donkere modus wisselen','สลับโหมดมืด'],
+tour_s:['Take the tour','Faire la visite','ابدأ الجولة','Tour starten','Start de tour','เริ่มทัวร์'],
+tour_x:['Stop tour','Arrêter la visite','إيقاف الجولة','Tour beenden','Stop de tour','หยุดทัวร์'],
+e_hint:['Tap the engine to boost it','Touchez le moteur pour le booster','المس المحرك لتعزيزه','Tippen Sie auf die Engine, um sie zu boosten','Tik op de engine om te boosten','แตะเอนจินเพื่อเร่งพลัง'],
+close:['Close','Fermer','إغلاق','Schließen','Sluiten','ปิด'],
+n_hero:['Aixelink','Aixelink','Aixelink','Aixelink','Aixelink','Aixelink']
+};
+let lang='en';const t=k=>{const a=T[k];return a?(a[LANGS.indexOf(lang)]||a[0]):k};
+const $=id=>document.getElementById(id);
+
+/* ============ PRODUCT DATA (names are brand names, so they are never translated) ============ */
+const U=id=>`https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=1200&q=75`;
+const IM={icu:'1559757148-5c350d0d3c56',or:'1519494026892-80bbd2d6fd0d',ed:'1576086213369-97a306d36557',ecg:'1579684385127-1ef15d508118',iv:'1631217868264-e5b90bb7e133',cus:'1551288049-bebda4e38f71',
+ vit:'1576086213369-97a306d36557',flow:'1519494026892-80bbd2d6fd0d',ent:'1551288049-bebda4e38f71',cla:'1550751827-4bd374c3f58b',phc:'1559757148-5c350d0d3c56',idh:'1516549655169-df83a0774514',ace:'1551288049-bebda4e38f71',ca:'1550751827-4bd374c3f58b',cb:'1559757148-5c350d0d3c56',ivl:'1631217868264-e5b90bb7e133'};
+const STD='HL7 / FHIR / DICOM / REST API';
+/* DIKW nodes: l = layer, s = short label (diagram), n = full name */
+const N={
+ idh:{l:'data',s:['IDH'],n:'IDH',w:'ww_idh'}, ace:{l:'data',s:['ACE'],n:'ACE · Aixelink Compute Engine'},
+ icu:{l:'info',s:['icuCare'],n:'icuCare'}, or:{l:'info',s:['orCare'],n:'orCare'}, ed:{l:'info',s:['edCare'],n:'edCare'},
+ ecg:{l:'info',s:['ECG'],n:'ECG'}, iv:{l:'info',s:['ivCare'],n:'ivCare (Careview)'}, cus:{l:'info',s:['Custom'],n:'Customized Workflow'},
+ vit:{l:'know',s:['Predictive','Vitalis'],n:'Predictive Vitalis'}, flow:{l:'know',s:['Smart','Workflow'],n:'Smart Workflow'}, ent:{l:'know',s:['Enterprise','Orchestration'],n:'Enterprise Care Orchestration'},
+ cla:{l:'wis',s:['CLAIRA'],n:'CLAIRA',w:'ww_cla'}, phc:{l:'wis',s:['Proactive','Hospital Care'],n:'Proactive Hospital Care'}
+};
+const ids=Object.keys(N),ORDER=['data','info','know','wis'],LET={data:'D',info:'I',know:'K',wis:'W'},LK={data:'d',info:'i',know:'k',wis:'w'};
+const inLayer=l=>ids.filter(k=>N[k].l===l),non=ids.filter(k=>N[k].l!=='data');
+const wide=()=>matchMedia('(min-width:900px) and (min-height:600px)').matches;
+
+/* ============ BUILD CONCENTRIC SVG ============ */
+const NS='http://www.w3.org/2000/svg',svg=$('dikw');
+const el=(tg,a,p=svg)=>{const e=document.createElementNS(NS,tg);for(const k in a)e.setAttribute(k,a[k]);p.appendChild(e);return e};
+const motion=(p,path,dur,begin)=>{const a=document.createElementNS(NS,'animateMotion');a.setAttribute('dur',dur);a.setAttribute('repeatCount','indefinite');a.setAttribute('path',path);a.setAttribute('begin',begin||'0s');p.appendChild(a)};
+const hex=(x,y,r)=>[0,1,2,3,4,5].map(k=>{const a=(60*k-90)*Math.PI/180;return (x+r*Math.cos(a)).toFixed(1)+','+(y+r*Math.sin(a)).toFixed(1)}).join(' ');
+const C={x:415,y:415},B={data:105,info:232,know:322,wis:412};
+const pol=(r,d)=>({x:C.x+r*Math.cos(d*Math.PI/180),y:C.y+r*Math.sin(d*Math.PI/180)});
+const pos={idh:{x:C.x,y:C.y+36},ace:{x:C.x,y:C.y-36}};
+['icu','or','ed','ecg','iv','cus'].forEach((k,i)=>pos[k]=pol(180,-90+60*i));      /* Information ring: 6 apps */
+pos.vit=pol(277,-60);pos.flow=pol(277,60);pos.ent=pol(277,180);                   /* Knowledge ring: 3 nodes in the gaps */
+pos.cla=pol(367,0);pos.phc=pol(367,120);                                           /* Wisdom ring: AI layer */
+const ang=k=>Math.atan2(pos[k].y-C.y,pos[k].x-C.x)*180/Math.PI;
+const circ=r=>`M${C.x-r},${C.y} a${r},${r} 0 1,0 ${2*r},0 a${r},${r} 0 1,0 ${-2*r},0`;
+let nodes={},bands={},badges={},edges={},pulses=[],sel=null;
+svg.innerHTML='<defs><linearGradient id="metal" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:var(--m1)"/><stop offset=".5" style="stop-color:var(--m2)"/><stop offset="1" style="stop-color:var(--m3)"/></linearGradient></defs>';
+[['wis',B.know,B.wis],['know',B.info,B.know],['info',B.data,B.info],['data',0,B.data]].forEach(([k,r0,r1])=>{
+  const b=el('path',{d:circ(r1)+(r0?' '+circ(r0):''),class:'band'});b.addEventListener('click',()=>select('layer',k));
+  b.addEventListener('pointerenter',e=>{if(e.pointerType==='mouse')select('layer',k)});bands[k]=b});
+const E=[['idh','ace'],...non.map(k=>['data',k])];
+E.forEach(([f,tg],i)=>{let d;if(f==='data'){const a=pol(B.data,ang(tg)),b=pos[tg];d=`M${a.x.toFixed(1)},${a.y.toFixed(1)} L${b.x.toFixed(1)},${b.y.toFixed(1)}`}
+  else d=`M${pos[f].x},${pos[f].y} L${pos[tg].x},${pos[tg].y}`;
+  edges[f+'>'+tg]={d,el:el('path',{d,class:'ln'})};const amb=el('circle',{r:2.4,class:'amb'});motion(amb,d,(5+i%4)+'s','-'+i+'s')});
+const BP={data:pol(86,-150),info:pol(168,-120),know:pol(277,-120),wis:pol(367,-120)};   /* D I K W badges */
+ORDER.forEach(k=>{const g=el('g',{class:'badge',role:'button',tabindex:0,transform:`translate(${BP[k].x.toFixed(1)},${BP[k].y.toFixed(1)})`});
+  el('circle',{r:14},g);el('text',{y:4.5},g).textContent=LET[k];badges[k]=g;g.addEventListener('click',()=>select('layer',k));
+  g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();select('layer',k)}})});
+ids.forEach(k=>{const p=pos[k],L=N[k].l,r=L==='wis'?44:L==='know'?42:L==='info'?36:33;
+  const g=el('g',{class:'node'+(N[k].s.length>1?' s':''),tabindex:0,role:'button','aria-label':N[k].n});
+  el('polygon',{points:hex(p.x,p.y,r+4),class:'halo'},g);el('polygon',{points:hex(p.x,p.y,r),class:'hx'},g);
+  if(N[k].s.length>1){el('text',{x:p.x,y:p.y-2},g).textContent=N[k].s[0];el('text',{x:p.x,y:p.y+11},g).textContent=N[k].s[1]}
+  else el('text',{x:p.x,y:p.y+4.5},g).textContent=N[k].s[0];
+  nodes[k]=g;g.addEventListener('click',()=>select('node',k));g.addEventListener('pointerenter',e=>{if(e.pointerType==='mouse')select('node',k)});
+  g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();select('node',k)}})});
+
+/* ============ SELECTION ENGINE ============ */
+const eds=k=>N[k].l==='data'?['idh>ace',...non.map(x=>'data>'+x)]:['data>'+k];
+function compute(s){const r={on:new Set(),path:new Set(),lon:new Set(),lpath:new Set(),ed:new Set()};
+  const l=s.type==='layer'?s.id:N[s.id].l;(s.type==='layer'?inLayer(l):[s.id]).forEach(k=>{r.on.add(k);eds(k).forEach(e=>r.ed.add(e))});
+  r.lon.add(l);ORDER.slice(0,ORDER.indexOf(l)).forEach(x=>r.lpath.add(x));if(l!=='data'){r.path.add('idh');r.path.add('ace')}return r}
+function select(type,id,auto){
+  if(!auto&&tourT)tourOn(false);
+  sel=id?{type,id}:null;const r=sel?compute(sel):{on:new Set(),path:new Set(),lon:new Set(),lpath:new Set(),ed:new Set()};
+  ids.forEach(k=>{nodes[k].classList.toggle('on',r.on.has(k));nodes[k].classList.toggle('path',r.path.has(k))});
+  ORDER.forEach(l=>{bands[l].classList.toggle('on',r.lon.has(l));bands[l].classList.toggle('path',r.lpath.has(l)&&!r.lon.has(l));badges[l].classList.toggle('on',r.lon.has(l))});
+  Object.keys(edges).forEach(e=>edges[e].el.classList.toggle('on',r.ed.has(e)));svg.classList.toggle('has-sel',!!sel);
+  pulses.forEach(p=>p.remove());pulses=[];r.ed.forEach(e=>[0,.5].forEach(b=>{const c=el('circle',{r:5,class:'pulse'});motion(c,edges[e].d,'1.3s',b+'s');pulses.push(c)}));
+  if(sel&&type==='node')burst(pos[id]);
+  const lay=sel?(type==='layer'?id:N[id].l):null;
+  document.querySelectorAll('.lay').forEach(d=>{const on=d.dataset.l===lay;d.classList.toggle('on',on);if(on&&!wide())d.classList.add('open');d.querySelector('.lay-h').setAttribute('aria-expanded',d.classList.contains('open'))});
+  document.querySelectorAll('.chip').forEach(b=>b.setAttribute('aria-pressed',!!sel&&type==='node'&&b.dataset.k===id));
+  panel();sheet()}
+
+/* ============ LAYER LIST (wide: 4 tabs · compact: accordion) ============ */
+function renderLayers(){const box=$('layers'),open=new Set([...box.querySelectorAll('.lay.open')].map(d=>d.dataset.l));box.innerHTML='';
+  ORDER.forEach((k,i)=>{const d=document.createElement('div');d.className='lay glass'+(open.has(k)||(!open.size&&i===0)?' open':'');d.dataset.l=k;
+    d.innerHTML=`<button class="lay-h" aria-expanded="false"><span class="lb">${LET[k]}</span><span><b>${t('L'+LK[k]+'n')}</b><small>${t('L'+LK[k]+'s')}</small></span><span class="chev">⌄</span></button><div class="lay-b"></div>`;
+    inLayer(k).forEach(id=>{const b=document.createElement('button');b.className='chip';b.textContent=N[id].s.join(' ');b.dataset.k=id;b.onclick=()=>select('node',id);d.querySelector('.lay-b').appendChild(b)});
+    d.querySelector('.lay-h').onclick=()=>{d.classList.toggle('open');select('layer',k)};box.appendChild(d)});}
+
+/* ============ DETAIL PANEL (+ bottom sheet on compact screens) ============ */
+const img=$('dimg');img.addEventListener('error',()=>img.style.opacity=0);img.addEventListener('load',()=>img.style.opacity=1);
+let inArch=false;
+function sheet(){$('detail').classList.toggle('open',!wide()&&!!sel&&inArch)}
+function panel(){const live=!!sel;$('detail').classList.toggle('live',live);$('hud').textContent=t(live?'hud_l':'hud_i');
+  const lay=live?(sel.type==='layer'?sel.id:N[sel.id].l):null;
+  $('crumb').innerHTML=ORDER.map(l=>`<span class="${live?(l===lay?'a':ORDER.indexOf(l)<ORDER.indexOf(lay)?'p':''):''}">${LET[l]} · ${t('L'+LK[l]+'n').replace(/ ?(Layer|Couche|Schicht|laag|طبقة|ชั้น) ?/i,' ').trim()||t('L'+LK[l]+'n')}</span>`).join('');
+  $('xbtn').setAttribute('aria-label',t('close'));
+  if(!live){$('stat').textContent=t('st_i');$('dt').textContent=t('pi_t');$('dsub').textContent=t('pi_s');$('dd').textContent=t('pi_d');$('dtags').innerHTML='';$('dlabel').hidden=true;$('dworks').hidden=true;$('dk').textContent='';img.style.opacity=0;return}
+  let tt,s,d,tags,w,im,lab;
+  if(sel.type==='layer'){const x=LK[sel.id];tt=t('L'+x+'n');s=t('L'+x+'s');d=t('L'+x+'d');tags=inLayer(sel.id).map(k=>`<button class="tag" data-k="${k}">${N[k].n.split(' · ')[0]}</button>`);im=IM[inLayer(sel.id)[0]];lab='lbl_p';w=null;
+    $('stat').textContent=t('st_c')+' · '+tt.toUpperCase()}
+  else{const k=sel.id,x=N[k];tt=x.n;s=t('L'+LK[x.l]+'n')+' · '+t('L'+LK[x.l]+'s');d=t('d_'+k);im=IM[k];lab='lbl_c';
+    tags=(x.l==='data'?(k==='idh'?['ACE',t('s1t')]:['IDH','EMR / HIS','PACS','LIS']):['IDH','ACE']).map(v=>`<span class="tag">${v}</span>`);
+    w=x.w?t(x.w):STD;$('stat').textContent=t('st_c')+' · '+x.s.join(' ').toUpperCase()}
+  $('dt').textContent=tt;$('dsub').textContent=s;$('dd').textContent=d;$('dlabel').textContent=t(lab);$('dlabel').hidden=false;$('dtags').innerHTML=tags.join('');
+  $('dtags').querySelectorAll('button').forEach(b=>b.onclick=()=>select('node',b.dataset.k));
+  $('dworks').hidden=!w;if(w)$('dworks').innerHTML=`<em>${t('wk')}</em> ${w}`;$('dk').textContent=(LET[N[sel.type==='layer'?inLayer(sel.id)[0]:sel.id].l]+' · '+t('L'+LK[sel.type==='layer'?sel.id:N[sel.id].l]+'s')).toUpperCase();img.src=U(im)}
+$('xbtn').onclick=()=>select(null);
+
+/* ============ PRODUCT CARDS (two categories, strict order) ============ */
+const WEB=[['icu','icuCare'],['or','orCare'],['ed','edCare'],['ecg','ECG'],['iv','ivCare (Careview)'],['cus','Customized Workflow']];
+const MOB=[['ca','Clinical Assistant'],['cb','Code Blue'],['ivl','ivLink (Carelink)']];
+function renderCards(){[['deck1',WEB,true],['deck2',MOB,false]].forEach(([box,list,link])=>{const d=$(box);d.innerHTML='';
+  list.forEach(([k,name])=>{const c=document.createElement('article');c.className='card glass';
+    c.innerHTML=`<div class="media"><img loading="lazy" referrerpolicy="no-referrer" alt="${name}" src="${U(IM[k])}"></div><div class="body"><h3>${name}</h3><p>${t('d_'+k)}</p><span class="works"><em>${t('wk')}</em> ${STD}</span>${link?`<button class="view">${t('view')} ↑</button>`:''}</div>`;
+    c.querySelector('img').addEventListener('error',e=>e.target.style.display='none');
+    if(link)c.querySelector('.view').onclick=()=>{select('node',k);$('architecture').scrollIntoView({behavior:'smooth'})};
+    c.addEventListener('pointermove',e=>{const r=c.getBoundingClientRect();c.style.setProperty('--mx',(e.clientX-r.left)+'px');c.style.setProperty('--my',(e.clientY-r.top-80)+'px');if(e.pointerType==='mouse'){c.style.setProperty('--ry',((e.clientX-r.left)/r.width-.5)*10+'deg');c.style.setProperty('--rx',-((e.clientY-r.top)/r.height-.5)*8+'deg')}});c.addEventListener('pointerleave',()=>{c.style.removeProperty('--rx');c.style.removeProperty('--ry')});d.appendChild(c)})})}
+
+/* ============ CLAIRA LIVE DEMO (illustrative) ============ */
+const wave=$('wave');for(let i=0;i<22;i++){const s=document.createElement('span');s.style.animationDelay=(i*.07)+'s';wave.appendChild(s)}
+let dTimers=[],di=0;const clr=()=>{dTimers.forEach(clearTimeout);dTimers=[]},later=(f,ms)=>dTimers.push(setTimeout(f,ms));
+function demo(){clr();const p=t('cd_p'+(di%2+1)),r=t('cd_r'+(di%2+1)),bu=$('bu'),ba=$('ba');bu.classList.remove('show');ba.classList.remove('show');bu.textContent='';ba.textContent='';
+  $('listen').textContent=t('cd_listen');wave.classList.add('on');
+  if(matchMedia('(prefers-reduced-motion:reduce)').matches){bu.textContent=p;ba.textContent=r;bu.classList.add('show');ba.classList.add('show');wave.classList.remove('on');return}
+  later(()=>{bu.classList.add('show');[...p].forEach((_,i)=>later(()=>bu.textContent=p.slice(0,i+1),i*45))},500);
+  const end=500+p.length*45;later(()=>{wave.classList.remove('on');$('listen').textContent='';ba.textContent=r;ba.classList.add('show')},end+500);
+  later(()=>{di++;demo()},end+5200)}
+$('mic').onclick=()=>{di++;demo()};
+
+/* ============ LANGUAGE (EN default, AR switches to RTL) + THEME ============ */
+function apply(){document.querySelectorAll('[data-i18n]').forEach(e=>e.textContent=t(e.dataset.i18n));
+  $('theme').setAttribute('aria-label',t('aria_t'));$('lang').setAttribute('aria-label','Language');
+  document.querySelectorAll('#dots a').forEach((a,i)=>a.setAttribute('aria-label',t(['n_hero','n_arch','n_ace','n_hero','n_hero','n_prod'][i])+(i===3?' IDH':i===4?' CLAIRA':'')));
+  renderLayers();renderCards();panel();demo()}
+function setLang(l){lang=l;document.documentElement.lang=l;document.documentElement.dir=l==='ar'?'rtl':'ltr';$('lang').value=l;try{localStorage.setItem('aixe-lang',l)}catch(e){}
+  const keep=sel;apply();if(keep)select(keep.type,keep.id)}
+$('lang').onchange=e=>setLang(e.target.value);
+const root=document.documentElement;
+function setTheme(m){root.dataset.theme=m;$('theme').setAttribute('aria-pressed',m==='dark');$('ico').textContent=m==='dark'?'☾':'☀';try{localStorage.setItem('aixe-theme',m)}catch(e){}}
+try{if(localStorage.getItem('aixe-theme')==='dark')setTheme('dark')}catch(e){}
+$('theme').onclick=()=>setTheme(root.dataset.theme==='dark'?'light':'dark');
+
+/* ============ SECTION DOTS + VIEWPORT TRACKING ============ */
+const SEC=['hero','architecture','ace','idh','claira','products'];
+SEC.forEach(id=>{const a=document.createElement('a');a.href='#'+id;$('dots').appendChild(a)});
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){document.querySelectorAll('#dots a').forEach((a,i)=>a.classList.toggle('on',SEC[i]===e.target.id))}}),{threshold:.55});
+SEC.forEach(id=>io.observe($(id)));
+new IntersectionObserver(es=>{inArch=es[0].isIntersecting;sheet()},{threshold:.3}).observe($('architecture'));
+matchMedia('(min-width:900px) and (min-height:600px)').addEventListener('change',()=>{sheet();renderLayers();if(sel)select(sel.type,sel.id)});
+
+/* ============ IDH 3D TILT ============ */
+const tilt=$('tilt'),st=$('stage3d');
+st.addEventListener('pointermove',e=>{if(e.pointerType!=='mouse')return;const r=st.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;tilt.style.transform=`rotateY(${x*22}deg) rotateX(${-y*16}deg)`});
+st.addEventListener('pointerleave',()=>tilt.style.transform='');
+
+
+/* ============ FUN LAYER: spark burst, DIKW tour, ACE boost, hex particles, magnetic buttons, reveal ============ */
+function burst(p){for(let i=0;i<10;i++){const a=i/10*6.283,c=el('circle',{cx:p.x,cy:p.y,r:3.5,class:'spark'});c.style.setProperty('--dx',Math.cos(a)*62+'px');c.style.setProperty('--dy',Math.sin(a)*62+'px');setTimeout(()=>c.remove(),900)}}
+const TOUR=['idh','ace','icu','or','ed','ecg','iv','cus','vit','flow','ent','cla','phc'];let tourT=null,ti=0;
+function tourOn(on){clearInterval(tourT);tourT=null;$('tour').classList.toggle('on',on);$('tico').textContent=on?'■':'▶';$('tlab').dataset.i18n=on?'tour_x':'tour_s';$('tlab').textContent=t(on?'tour_x':'tour_s');
+  if(on){const step=()=>select('node',TOUR[ti++%TOUR.length],true);step();tourT=setInterval(step,2800)}}
+$('tour').onclick=()=>tourOn(!tourT);
+$('ace').querySelector('.engine').addEventListener('click',function(){this.classList.add('boost');setTimeout(()=>this.classList.remove('boost'),1800)});
+document.querySelectorAll('.btn').forEach(b=>{b.addEventListener('pointermove',e=>{if(e.pointerType!=='mouse')return;const r=b.getBoundingClientRect();b.style.setProperty('--tx',((e.clientX-r.left)/r.width-.5)*10+'px');b.style.setProperty('--ty',((e.clientY-r.top)/r.height-.5)*8+'px')});b.addEventListener('pointerleave',()=>{b.style.removeProperty('--tx');b.style.removeProperty('--ty')})});
+addEventListener('pointermove',e=>{if(e.pointerType==='mouse'){root.style.setProperty('--px',e.clientX+'px');root.style.setProperty('--py',e.clientY+'px')}});
+const rio=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');rio.unobserve(e.target)}}),{threshold:.12});
+document.querySelectorAll('.two>*,.idh-wrap,.sec-head,.strip,.cat').forEach(e=>{e.classList.add('rv');rio.observe(e)});
+(function(){const c=$('fx'),x=c.getContext('2d');if(matchMedia('(prefers-reduced-motion:reduce)').matches){c.remove();return}
+  let W,H,P=[],m={x:-999,y:-999};
+  const rs=()=>{W=c.width=innerWidth;H=c.height=innerHeight;P=Array.from({length:Math.round(W*H/52000)+8},()=>({x:Math.random()*W,y:Math.random()*H,r:10+Math.random()*26,vx:(Math.random()-.5)*.25,vy:(Math.random()-.5)*.25,a:Math.random()*6,s:(Math.random()-.5)*.004}))};
+  rs();addEventListener('resize',rs);addEventListener('pointermove',e=>{m.x=e.clientX;m.y=e.clientY});
+  (function loop(){x.clearRect(0,0,W,H);const col=getComputedStyle(root).getPropertyValue('--ac').trim()||'#0889a3';
+    P.forEach(p=>{const dx=p.x-m.x,dy=p.y-m.y,d=Math.hypot(dx,dy)||1;if(d<150){p.x+=dx/d*1.8;p.y+=dy/d*1.8}
+      p.x+=p.vx;p.y+=p.vy;p.a+=p.s;if(p.x<-40)p.x=W+40;if(p.x>W+40)p.x=-40;if(p.y<-40)p.y=H+40;if(p.y>H+40)p.y=-40;
+      x.strokeStyle=col;x.globalAlpha=d<190?.5:.17;x.lineWidth=1.2;x.beginPath();for(let i=0;i<6;i++){const a=p.a+i*Math.PI/3;x.lineTo(p.x+p.r*Math.cos(a),p.y+p.r*Math.sin(a))}x.closePath();x.stroke()});
+    requestAnimationFrame(loop)})()})();
+
+let saved='en';try{saved=localStorage.getItem('aixe-lang')||'en'}catch(e){}
+setLang(LANGS.includes(saved)?saved:'en');
+</script>
+</body>
+</html>
